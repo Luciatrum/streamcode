@@ -10,7 +10,7 @@ engine = pyttsx3.init()
 # Create a Twitch Chat Bot instance
 class Bot(commands.Bot):
     def __init__(self):
-        super().__init__(token=os.environ['TWITCH_TOKEN'], prefix='?', initial_channels=['TWITCH_CHANNEL'])
+        super().__init__(token=os.environ['TMI_TOKEN'], prefix='?', initial_channels=['luciatrum'])
 
     # Event handler for incoming chat messages
     async def event_message(self, ctx):
