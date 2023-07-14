@@ -1,7 +1,7 @@
 import yt_dlp
 
 # Set the default destination directory
-default_directory = r"C:\Users\sebas\Music\Playlists\Battle Music"
+default_directory = r"C:\Users\lucia\Music\Playlists\Battle Music"
 
 # Specify the destination directory
 destination = input("Enter the destination (leave blank for default directory: {}) ".format(default_directory)) or default_directory
