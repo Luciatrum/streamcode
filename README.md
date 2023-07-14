@@ -31,3 +31,10 @@ If Azurebot is too complicated, we also built a very basic bot that reads out al
     - Define the Device that will be outputting the Audio. (Ex. VIRTUAL_AUDIO_CABLE)
 
   Similar to before, you can just run it, and test it using chat.
+
+# mp3download
+This is what was used to obtain the pure mp3 files we used for our background music. Effectively, this allows you to bulk download any YouTube playlist and save the audio on your local machine!
+
+  ## Pre-requisites
+    - Update the directory
+That's it, just paste the URL of a playlist or video, and it'll download.
