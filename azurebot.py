@@ -34,7 +34,7 @@ synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
 
 class MyBot(commands.Bot):
     def __init__(self):
-        super().__init__(token=os.environ['TMI_TOKEN'], prefix='!', initial_channels=['luciatrum'])
+        super().__init__(token=os.environ['TWITCH_TOKEN'], prefix='!', initial_channels=['CHANNEL_NAME'])
         self.assigned_voices = {}  # Store assigned voices for users
 
 
