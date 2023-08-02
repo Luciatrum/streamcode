@@ -1,43 +1,64 @@
-import pyttsx3
 import os
 import sounddevice as sd
 import soundfile as sf
+import pyttsx3
+import asyncio
 from twitchio.ext import commands
 
-# Create a TTS engine
-engine = pyttsx3.init()
+def generate_tts(text):
+    engine = pyttsx3.init()
+    engine.save_to_file(text, 'temp.wav')
+    engine.runAndWait()
 
-# Create a Twitch Chat Bot instance
 class Bot(commands.Bot):
     def __init__(self):
-        super().__init__(token=os.environ['TWITCH_TOKEN'], prefix='?', initial_channels=['TWITCH_CHANNEL'])
+        super().__init__(token=os.environ['TMI_TOKEN'], prefix='?', initial_channels=['luciatrum'])
 
-    # Event handler for incoming chat messages
+    async def event_ready(self):
+        print(f'Logged in as | {self.nick}')
+        print(f'User id is | {self.user_id}')
+
     async def event_message(self, ctx):
-        # Check if the message is from a subscriber
+        if ctx.echo or ctx.author.name.lower() in ['soundalerts', 'nightbot', 'streamelements']:
+            return
+
+        # Ignore any message that starts with '!'
+        if ctx.content.startswith('!'):
+            return
+
+        # Check if the message sender is a subscriber
         if ctx.author.is_subscriber:
-            # Extract the message content
-            message = ctx.content
+            # Read out the incoming message
+            await self.read_message(ctx)
 
-            # Pass the message to pyttsx3 for speech synthesis
-            engine.save_to_file(message, "temp.wav")
-            engine.runAndWait()
+    async def read_message(self, ctx):
+        # Generate the TTS audio using your preferred TTS library
+        generate_tts(ctx.content)
 
-            # Set the virtual audio cable device as the default output
-            devices = sd.query_devices()
-            for device in devices:
-                if "VIRTUAL_AUDIO_CABLE" in device["name"]:
-                    sd.default.device = device["name"]
-                    break
+        # Save the audio to a temporary WAV file
+        wav_file_path = 'temp.wav'
+        audio_data, sample_rate = sf.read(wav_file_path, dtype="float32")
 
-            # Read the audio file
-            audio_data, sample_rate = sf.read("temp.wav", dtype="float32")
+        # Set the virtual audio cable input device as the default input
+        input_device = 'CABLE Input (VB-Audio Virtual Cable)'
+        devices = sd.query_devices()
+        input_device_index = None
+        for i, device in enumerate(devices):
+            if device['name'] == input_device:
+                input_device_index = i
+                break
+        if input_device_index is None:
+            print(f"Input device '{input_device}' not found.")
+            return
 
-            # Play the synthesized speech through the virtual audio cable
-            sd.play(audio_data, sample_rate)
+        # Play the synthesized speech through the specified input device
+        sd.play(audio_data, sample_rate, device=input_device_index)
 
-# Create an instance of the Bot class
+        # Wait until playback is finished
+        sd.wait()
+
+        # Remove the temporary WAV file
+        os.remove(wav_file_path)
+
 bot = Bot()
-
-# Run the Twitch Chat Bot
 bot.run()
