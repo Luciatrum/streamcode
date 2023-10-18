@@ -2,8 +2,10 @@ import os
 import sounddevice as sd
 import soundfile as sf
 import pyttsx3
-import asyncio
 from twitchio.ext import commands
+
+# List of terms to filter out
+filter_terms = ['luciat2', 'agentj26', 'emote2', 'emote3']
 
 def generate_tts(text):
     engine = pyttsx3.init()
@@ -19,7 +21,7 @@ class Bot(commands.Bot):
         print(f'User id is | {self.user_id}')
 
     async def event_message(self, ctx):
-        if ctx.echo or ctx.author.name.lower() in ['soundalerts', 'nightbot', 'streamelements']:
+        if ctx.echo or ctx.author.name.lower() in ['soundalerts', 'nightbot', 'streamelements','luciatrum']:
             return
 
         # Ignore any message that starts with '!'
@@ -28,12 +30,15 @@ class Bot(commands.Bot):
 
         # Check if the message sender is a subscriber
         if ctx.author.is_subscriber:
-            # Read out the incoming message
-            await self.read_message(ctx)
+            # Filter out specified terms from the message content
+            filtered_content = ' '.join(word for word in ctx.content.split() if not any(term in word for term in filter_terms))
 
-    async def read_message(self, ctx):
+            if filtered_content.strip():  # Check if there's content left after filtering
+                await self.read_message(filtered_content)
+
+    async def read_message(self, content):
         # Generate the TTS audio using your preferred TTS library
-        generate_tts(ctx.content)
+        generate_tts(content)
 
         # Save the audio to a temporary WAV file
         wav_file_path = 'temp.wav'
